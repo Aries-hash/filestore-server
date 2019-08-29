@@ -10,8 +10,8 @@ import (
 var db *sql.DB
 
 func init() {
-	sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8")
-	db.SetMaxOpenConns(1000)
+	db,_=sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8")
+	db.SetMaxOpenConns(500)
 	err := db.Ping()
 	if err != nil {
 		fmt.Printf("Failed to connect to mysql,err:" + err.Error())
