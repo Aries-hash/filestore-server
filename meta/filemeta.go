@@ -29,6 +29,21 @@ func UpdateFileMetaDB(fmeta FileMeta) bool {
 	return mydb.OnFileUploadFinished(fmeta.FileSha1, fmeta.FileName, fmeta.FileSize, fmeta.Location)
 }
 
+//GetFileMetaDB:从mysql获取文件元信息
+func GetFileMetaDB(fileSha1 string) (*FileMeta, error) {
+	tfile, err := mydb.GetFileMeta(fileSha1)
+	if tfile == nil || err != nil {
+		return nil, err
+	}
+	fmeta := FileMeta{
+		FileSha1: tfile.FileHash,
+		FileName: tfile.FileName.String,
+		FileSize: tfile.FileSize.Int64,
+		Location: tfile.FileAddr.String,
+	}
+	return &fmeta, nil
+}
+
 //GetFileMeta:通过Sha1获取文件的元信息对象
 func GetFileMeta(fileSha1 string) FileMeta {
 	return fileMetas[fileSha1]
