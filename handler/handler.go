@@ -32,7 +32,7 @@ func UploadHandler(w http.ResponseWriter,r *http.Request)  {
 
 		fileMeta:=meta.FileMeta{
 			FileName: header.Filename,
-			Location: "D:/upload/"+header.Filename,
+			Location: "/usr/share/nginx/html/upload/"+header.Filename,
 			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 
