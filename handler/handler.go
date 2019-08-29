@@ -138,3 +138,4 @@ func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	meta.RemoveFileMeta(filesha1)
 	w.WriteHeader(http.StatusOK)
 }
+
