@@ -10,9 +10,11 @@ import (
 	"path/filepath"
 )
 
+
 type Sha1Stream struct {
 	_sha1 hash.Hash
 }
+
 
 func (obj *Sha1Stream) Update(data []byte) {
 	if obj._sha1 == nil {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-//OnFileUploadFinished:文件上传完成,保存meta
+// OnFileUploadFinished : 文件上传完成,保存meta
 func OnFileUploadFinished(filehash string, filename string, filesize int64, fileaddr string) bool {
 
 	stmt, err := mydb.DBConn().Prepare("insert ignore into tbl_file" +
@@ -30,7 +30,7 @@ func OnFileUploadFinished(filehash string, filename string, filesize int64, file
 	return false
 }
 
-//TableFile:文件表结构体
+// TableFile : 文件表结构体
 type TableFile struct {
 	FileHash string
 	FileName sql.NullString
@@ -38,7 +38,7 @@ type TableFile struct {
 	FileAddr sql.NullString
 }
 
-//GetFileMeta:从mysql获取文件元信息
+// GetFileMeta : 从mysql获取文件元信息
 func GetFileMeta(filehash string) (*TableFile, error) {
 	stmt, err := mydb.DBConn().Prepare(
 		"select file_sha1,file_addr,file_name,file_size from tbl_file " +
@@ -56,10 +56,9 @@ func GetFileMeta(filehash string) (*TableFile, error) {
 		if err == sql.ErrNoRows {
 			// 查不到对应记录， 返回参数及错误均为nil
 			return nil, nil
-		} else {
-			fmt.Println(err.Error())
-			return nil, err
 		}
+		fmt.Println(err.Error())
+		return nil, err
 	}
 	return &tfile, nil
 }
