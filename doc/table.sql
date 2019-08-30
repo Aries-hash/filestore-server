@@ -57,3 +57,6 @@ CREATE TABLE `tbl_user_file` (
   KEY `idx_status` (`status`),
   KEY `idx_user_id` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 在处理快速上传的时候,需要把tbl_user_file的index:UNIQUE KEY `idx_user_file` (`user_name`, `file_sha1`)去掉
+-- alter TABLE tbl_user_file drop index `idx_user_file`;
