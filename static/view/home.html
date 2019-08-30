@@ -3,30 +3,33 @@
 <head>
   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
   <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
   <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
+    integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
   <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+  </script>
 
   <script src="/static/js/auth.js"></script>
+  <script src="https://cdn.bootcss.com/layer/3.1.0/layer.js"></script>
+  <script src="http://apps.bdimg.com/libs/layer/2.1/layer.js"></script>
 </head>
 
-<body style="width:100%;height:100%">
+<body style="width:100%;height:100%;background:#f8f8f8">
   <div style="width:100%;height:100%;margin:0 0 10px 0;text-align: center;">
-    <div style="font-size:20px;font-weight:bold;
-                margin:0;background: rgb(195, 228, 250);height:32px;">
+    <div style="font-size:20px;font-weight:bold;color:#ddd; 
+      margin:0;padding-top:3px;background:#383e4b;height:40px;">
       文件云盘首页
     </div>
-    <table style="height:100%;width:100%;text-align: left;border-width: 2px; border-color: lightslategrey;">
+    <table style="height:100%;width:100%;text-align: left;border-width: 2px; border-color: rgb(203, 215, 248);">
       <tbody>
         <tr style="margin-bottom: 20px;">
-          <td style="width:20%;height: 100%;background: lightsteelblue;">
+          <td style="width:15%;height: 100%;background: rgb(138, 186, 248);">
             <div style="text-align: top;height:20%;margin: 10px 0 0 10px;">
               <img style="width:80px;height:80px;" src="/static/img/avatar.jpeg"></img><br>
               用户名: <p id="username" style="color: seagreen"></p>
@@ -35,15 +38,16 @@
             <div style="height: 80%;"></div>
           </td>
           <td style="width: 3px;height:100%;">
-            <div style="width:100%;height: 100%;background:rgb(202, 157, 248);"></div>
+            <div style="width:100%;height: 100%;background:rgb(68, 152, 248);"></div>
           </td>
-          <td style="text-align: top;">
-            <div>文件列表
-              <button class="btn btn-success" onclick="toUploadFile()" style="float: right;margin-right: 30px;">上传文件
+          <td style="text-align: top;vertical-align: top;">
+            <div style="width:100%;">
+              <span>文件列表</span>
+              <button class="btn btn-primary" onclick="toUploadFile()" style="margin:5px;">上传文件
               </button>
-              <div style="width:100%;height: 1px;background:rgb(202, 157, 248);margin-top: 15px;"></div>
+              <div style="width:100%;height: 1px;background:rgb(48, 143, 252);"></div>
             </div>
-            <div style="height:95%;" style="width:100%;">
+            <div style="width:100%;">
               <table id="filetbl" style="margin-left:3%;width:96%;">
                 <thead style="height:50px;border:1px;">
                   <tr style="height:50px;border:1px;">
@@ -70,15 +74,17 @@
     $.ajax({
       url: "/user/info?" + queryParams(),
       type: "POST",
-      error: function (jqXHR, textStatus, errorThrown) {
-        if (textStatus == "error") {
-          alert(textStatus + " : " + errorThrown);
-        } else {
-          alert(textStatus);
-        }
+      error: function (err) {
+        alert(JSON.stringify(err));
       },
-      success: function (body, textStatus, jqXHR) {
-        var resp = JSON.parse(body);
+      success: function (body) {
+        var resp = body;
+        if (typeof (resp) == 'string') {
+          resp = JSON.parse(body);
+        }
+        if (resp.code == 10005) {
+          window.location.href = "/static/view/signin.html";
+        }
         document.getElementById("username").innerHTML = resp.data.Username;
         document.getElementById("regtime").innerHTML = resp.data.SignupAt;
         updateFileList();
@@ -93,26 +99,43 @@
       data: {
         limit: 15
       },
-      error: function (jqXHR, textStatus, errorThrown) {
-        if (textStatus == "error") {
-          alert(textStatus + " : " + errorThrown);
-        } else {
-          alert(textStatus);
-        }
+      error: function (err) {
+        alert(JSON.stringify(err));
       },
-      success: function (body, textStatus, jqXHR) {
+      success: function (body) {
         if (!body) {
           return;
         }
-        var data = JSON.parse(body);
+        var data = body;
         if (!data || data.length <= 0) {
           return;
         }
 
+        var dlHost = 'http://localhost:8080';
+        var dlEntry = localStorage.getItem('downloadEntry');
+        if (dlEntry != '') {
+          if (dlEntry.indexOf('http:')<0) {
+            dlHost = 'http://' + dlEntry;
+          } else {
+            dlHost = dlEntry;
+          }
+        }
+        
+        var downloadHtml = '<button class="btn btn-info" ' +
+          'style="height:30px;margin:5px 3px;"' +
+          'onClick = "downloadFile(\'' + dlHost + '/file/downloadurl?filehash={0}&{1}\')">下载</button>';
+        var renameFileHtml = '<button class="btn btn-warning" ' +
+          'style="height:30px;margin:5px 3px;"' +
+          'onClick = "renameFile(\'{0}\',\'{1}\',\'http://apigw.fileserver.com/file/' +
+          'update?op=0&filehash={2}&{3}\')">重命名</button>';
+        var cdlFileHtml = '<button class="btn btn-info" ' +
+          'style="height:30px;margin:5px 3px;"' +
+          'onClick = "cdlFile(\'' + dlHost + '/file/download?filehash={0}&{1}\')">断点下载(火狐)</button>';
+
         for (var i = 0; i < data.length; i++) {
           var x = document.getElementById('filetbl').insertRow();
           var cell = x.insertCell();
-          cell.innerHTML = data[i].FileHash.substr(0, 20)+"...";
+          cell.innerHTML = data[i].FileHash.substr(0, 20) + "...";
 
           cell = x.insertCell();
           cell.innerHTML = data[i].FileName;
@@ -127,31 +150,28 @@
           cell.innerHTML = data[i].LastUpdated;
 
           cell = x.insertCell();
-          cell.innerHTML = '<button class="btn btn-success" ' +
-            'style="height:30px;margin:5px 0;"' +
-            'onClick = "downloadFile(\'http://localhost:8080/file/' +
-            'downloadurl?filehash=' + data[i].FileHash + '&' + queryParams() + '\')">下载</button>';
+          cell.innerHTML = downloadHtml.format(data[i].FileHash, queryParams()) + cdlFileHtml
+            .format(data[i].FileHash, queryParams()) +
+            renameFileHtml.format(data[i].FileHash, data[i].FileName, data[i].FileHash,
+              queryParams());
         }
       }
     });
   }
 
   function toUploadFile() {
-    window.location.href = '/file/upload?' + queryParams();
+    // window.location.href = '/file/upload?' + queryParams();
+    window.location.href = "/static/view/upload.html";
   }
 
   function downloadFile(durl) {
     $.ajax({
       url: durl,
       type: "POST",
-      error: function (jqXHR, textStatus, errorThrown) {
-        if (textStatus == "error") {
-          alert(textStatus + " : " + errorThrown);
-        } else {
-          alert(textStatus);
-        }
+      error: function (err) {
+        alert(JSON.stringify(err));
       },
-      success: function (body, textStatus, jqXHR) {
+      success: function (body) {
         try {
           alert("文件即将下载自: " + body);
           var elemIF = document.createElement("iframe");
@@ -161,6 +181,45 @@
         } catch (e) {
           alert(e);
         }
+      }
+    });
+  }
+
+  function cdlFile(durl) {
+    localStorage.setItem('curDownloadUrl', durl);
+    layer.open({
+      type: 2,
+      title: '断点续传下载演示',
+      maxmin: true,
+      shadeClose: true, //点击遮罩关闭层
+      area: ['600px', '300px'],
+      content: '/static/view/download.html'
+    });
+  }
+
+  function renameFile(filehash, filename, renameUrl) {
+    var newFileName = prompt("\n当前文件名: {0}\n\n请输入新的文件名: ".format(filename));
+    newFileName = newFileName.trim();
+
+    if (newFileName.length <= 0) {
+      alert("文件名不能为空");
+      return;
+    }
+
+    if (newFileName.indexOf(" ") >= 0) {
+      alert("文件名不能包含空格");
+      return;
+    }
+
+    $.ajax({
+      url: renameUrl + "&filename=" + newFileName,
+      type: "POST",
+      error: function (msg) {
+        alert(msg);
+      },
+      success: function (body) {
+        alert("文件名修改成功");
+        window.location.href = '/static/view/home.html';
       }
     });
   }
