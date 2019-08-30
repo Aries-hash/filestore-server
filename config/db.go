@@ -6,6 +6,6 @@ const (
 	// 127.0.0.1:3306 是ip及端口；
 	// fileserver 是数据库名; 
 	// charset=utf8 指定了数据以utf8字符编码进行传输
-	//MySQLSource = "root:Yh15984763372..@tcp(127.0.0.1:3306)/fileserver?charset=utf8" //remote
-	MySQLSource = "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8" //local
+	MySQLSource = "root:Yh15984763372..@tcp(127.0.0.1:3306)/fileserver?charset=utf8" //remote
+	//MySQLSource = "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8" //local
 )
