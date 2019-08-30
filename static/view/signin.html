@@ -3,16 +3,17 @@
 <head>
   <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
   <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
   <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
+    integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
   <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+  </script>
 </head>
 
 <body>
@@ -41,7 +42,7 @@
               <label for="password" class="l"> 密码:</label>
             </td>
             <td>
-              <input id="password" type="text" style="height:30px;width:250px;padding-right:50px;">
+              <input id="password" type="password" style="height:30px;width:250px;padding-right:50px;">
             </td>
           </tr>
           <tr>
@@ -52,7 +53,8 @@
             <td>
             </td>
             <td>
-              <input class="btn btn-success" type="button" style="margin:0 auto;width:250px;" value="登录" onclick='onSignin()' />
+              <input class="btn btn-success" type="button" style="margin:0 auto;width:250px;" value="登录"
+                onclick='onSignin()' />
             </td>
           </tr>
         </tbody>
@@ -72,18 +74,17 @@
         "username": username.value,
         "password": password.value
       },
-      error: function (jqXHR, textStatus, errorThrown) {
-        if (textStatus == "error") {
-          alert(textStatus + " : " + errorThrown);
-        } else {
-          alert(textStatus);
-        }
+      error: function (err) {
+        alert(err);
       },
-      success: function (body, textStatus, jqXHR) {
-        var resp = JSON.parse(body);
-        localStorage.setItem("token", resp.data.Token)
-        localStorage.setItem("username", resp.data.Username)
-        window.location.href = resp.data.Location;
+      success: function (body) {
+        localStorage.setItem("token", body.data.Token)
+        localStorage.setItem("username", body.data.Username)
+        // 增加上传入口ip:port
+        localStorage.setItem("uploadEntry", body.data.UploadEntry);
+        // 增加下载入口ip:port
+        localStorage.setItem("downloadEntry", body.data.DownloadEntry);
+        window.location.href = body.data.Location;
       }
     });
   }
