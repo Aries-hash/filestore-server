@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"os/user"
 	"encoding/json"
 	"filestore-server/meta"
 	"filestore-server/util"
