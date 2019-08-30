@@ -2,10 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
-
 	dblayer "filestore-server/db"
 	"filestore-server/util"
 )
@@ -18,13 +16,13 @@ const (
 // SignupHandler : 处理用户注册请求
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		data, err := ioutil.ReadFile("./static/view/signup.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.Write(data)
-		//http.Redirect(w, r, "/static/view/signup.html", http.StatusFound)
+		// data, err := ioutil.ReadFile("./static/view/signup.html")
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+		// w.Write(data)
+		http.Redirect(w, r, "/static/view/signup.html", http.StatusFound)
 		return
 	}
 	r.ParseForm()
@@ -51,13 +49,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 // SignInHandler : 登录接口
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		data, err := ioutil.ReadFile("./static/view/signin.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.Write(data)
-		//http.Redirect(w, r, "/static/view/signin.html", http.StatusFound)
+		// data, err := ioutil.ReadFile("./static/view/signin.html")
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+		// w.Write(data)
+		http.Redirect(w, r, "/static/view/signin.html", http.StatusFound)
 		return
 	}
 
