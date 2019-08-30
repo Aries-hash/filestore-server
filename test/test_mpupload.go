@@ -74,11 +74,11 @@ func multipartUpload(filename string, targetURL string, chunkSize int) error {
 
 	return nil
 }
-
+// 用于测试文件的分块上传
 func main() {
-	username := "admin"
-	token := "7aefb80d3c2847e6182539a5b6b608055d68b6ff"
-	filehash := "d5a2edfa98a2a62be57e8ca6164f06e5b509fca7"
+	username := "admin" //用户名
+	token := "7aefb80d3c2847e6182539a5b6b608055d68b6ff" //用户的token
+	filehash := "d5a2edfa98a2a62be57e8ca6164f06e5b509fca7" //文件的hash
 
 	// 1. 请求初始化分块上传接口
 	resp, err := http.PostForm(
@@ -87,7 +87,7 @@ func main() {
 			"username": {username},
 			"token":    {token},
 			"filehash": {filehash},
-			"filesize": {"132489256"},
+			"filesize": {"127961523"}, //文件的大小
 		})
 
 	if err != nil {
@@ -108,9 +108,9 @@ func main() {
 	fmt.Printf("uploadid: %s  chunksize: %d\n", uploadID, chunkSize)
 
 	// 3. 请求分块上传接口
-	filename := "/root/go1.12.9.linux-amd64.tar.gz"
+	filename := "/root/go1.12.9.linux-amd64.tar.gz"    //文件的路径名
 	tURL := "http://localhost:8080/file/mpupload/uppart?" +
-		"username=admin&token=" + token + "&uploadid=" + uploadID
+		"username=admin&token=" + token + "&uploadid=" + uploadID //请求的url
 	multipartUpload(filename, tURL, chunkSize)
 
 	// 4. 请求分块完成接口
