@@ -1,17 +1,19 @@
 package handler
 
 import (
-	"os/user"
 	"encoding/json"
-	"filestore-server/meta"
-	"filestore-server/util"
-	dbplayer "filestore-server/db"
+	
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
+
+	dblayer "filestore-server/db"
+	"filestore-server/meta"
+	"filestore-server/util"
 )
 
 //UploadHandler 处理文件上传
@@ -59,7 +61,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//TODO:更新用户文件表记录
 		r.ParseForm()
 		username:=r.Form.Get("username")
-        suc:=dbplayer.OnUserFileUploadFinished(username,fileMeta.FileSha1,fileMeta.FileName,fileMeta.FileSize)
+        suc:=dblayer.OnUserFileUploadFinished(username,fileMeta.FileSha1,fileMeta.FileName,fileMeta.FileSize)
 		if suc{
 			http.Redirect(w,r,"/static/view/home.html",http.StatusFound)
 		}else{
@@ -92,7 +94,28 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-//DownloadHandler:文件下载
+// FileQueryHandler : 查询批量的文件元信息
+func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limitCnt, _ := strconv.Atoi(r.Form.Get("limit"))
+	username := r.Form.Get("username")
+	//fileMetas, _ := meta.GetLastFileMetasDB(limitCnt)
+	userFiles, err := dblayer.QueryUserFileMetas(username, limitCnt)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(userFiles)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+// DownloadHandler : 文件下载
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fsha1 := r.Form.Get("filehash")
@@ -142,7 +165,7 @@ func FileMetaUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-//FileDeleteHandler:删除文件元信息
+// FileDeleteHandler : 删除文件元信息
 func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filesha1 := r.Form.Get("filehhash")
