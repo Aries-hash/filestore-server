@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"os/user"
 	"encoding/json"
 	"filestore-server/meta"
 	"filestore-server/util"
+	dbplayer "filestore-server/db"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -49,9 +51,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		newFile.Seek(0, 0)
+        
 		fileMeta.FileSha1 = util.FileSha1(newFile)
+        
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
+		//TODO:更新用户文件表记录
+		r.ParseForm()
+		username:=r.Form.Get("username")
+        suc:=dbplayer.OnUserFileUploadFinished(username,fileMeta.FileSha1,fileMeta.FileName,fileMeta.FileSize)
+		if suc{
+			http.Redirect(w,r,"/static/view/home.html",http.StatusFound)
+		}else{
+			w.Write([]byte("Upload Failed!"))
+		}
 		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
 	}
 }
