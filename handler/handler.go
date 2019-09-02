@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"filestore-server/store/ceph"
 	"encoding/json"
 	
 	"fmt"
@@ -55,7 +56,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		newFile.Seek(0, 0)
         
 		fileMeta.FileSha1 = util.FileSha1(newFile)
-        
+		
+		//同时将文件写入到ceph存储中
+		newFile.Seek(0, 0)
+        data,_:=ioutil.ReadAll(newFile)
+        bucket:=ceph.GetCephBucket("userfile")
+		cephPath:="/ceph/"+fileMeta.FileSha1
+		_=bucket.Put(cephPath,data,"octet-stream",s3.PublicRead)
+        fileMeta.Location=cephPath
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
 		//TODO:更新用户文件表记录
