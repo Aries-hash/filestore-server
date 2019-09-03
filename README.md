@@ -6,39 +6,6 @@
 
 <img src='/doc/microservice_interact_archi.png' width="800px"></img>
 
-## 关于分支和标签
-
-- 分支说明:
-    - master分支: 通过原生net/http实现各接口功能
-    - gin分支: 通过Gin框架来改造http协议通讯相关模块代码
-    - pkg分支: 通过go-bindata等工具实现静态资源打包的一个示例
-    - 其他分支与每章节的内容大致对应(比如第九章代码可以参考[charter9分支](https://git.imooc.com/coding-323/filestore-server/src/charter9))
-
-- 标签
-    - tag是分支代码某个阶段的快照。如`master`主分支的`v0.1`是首个发布的版本，该版本接入了阿里OSS。
-
-## 关于源码版本下载
-
-建议按`每章对应的分支代码`来看，`master`主分支代码为最新版本代码。
-
-- master分支为最新提交的代码
-
-```bash
-git clone https://git.imooc.com/coding-323/filestore-server.git
-```
-
-- 第九章(RabbitMQ异步存储)章节的代码，可以下载标签为`v0.3`的版本:
-
-```bash
-git clone --branch v0.3 https://git.imooc.com/coding-323/filestore-server.git
-```
-
-- 第八章(OSS)及之前章节的代码，可以下载标签为`v0.2`的版本:
-
-```bash
-git clone --branch v0.2 https://git.imooc.com/coding-323/filestore-server.git
-```
-
 ## 关于需要手动安装的库
 
 如下：
@@ -176,4 +143,3 @@ go get -v github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit
 - go-micro微服务框架: [github源码](https://github.com/micro/go-micro)
 - gin web框架: [github源码](https://github.com/gin-gonic/gin)
 - k8s: [中文社区](https://www.kubernetes.org.cn/docs)
-- 我的手记博客 [http://www.imooc.com/u/6198190](http://www.imooc.com/u/6198190)
