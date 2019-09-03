@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package go.micro.service.user;
+
+service UserService {
+    // 用户注册
+    rpc Signup(ReqSignup) returns (RespSignup) {}
+    // 用户登录
+    rpc Signin(ReqSignin) returns (RespSignin) {}
+    // 获取用户信息
+    rpc UserInfo(ReqUserInfo) returns (RespUserInfo) {}
+    // 获取用户文件
+    rpc UserFiles(ReqUserFile) returns (RespUserFile) {}
+   // 获取用户文件
+    rpc UserFileRename(ReqUserFileRename) returns (RespUserFileRename) {}
+}
+
+message ReqSignup {
+    string username = 1;
+    string password = 2;
+}
+
+message RespSignup {
+    int32 code = 1;
+    string message = 2;
+}
+
+message ReqSignin {
+    string username = 1;
+    string password = 2;
+}
+
+message RespSignin {
+    int32 code = 1;
+    string token = 2;
+    string message = 3;
+}
+
+message ReqUserInfo {
+    string username = 1;
+}
+
+message RespUserInfo {
+    int32 code = 1;
+    string message =2;
+    string username =3;
+    string email = 4;
+    string phone = 5;
+    string signupAt = 6;
+    string lastActiveAt = 7;
+    int32 status = 8;
+}
+
+message ReqUserFile {
+    string username = 1;
+    int32 limit = 2;
+}
+
+message RespUserFile {
+    int32 code = 1;
+    string message =2;
+    bytes fileData = 3;
+}
+
+message ReqUserFileRename {
+  string username = 1;
+  string filehash = 2;
+  string newFileName = 3;
+}
+
+message RespUserFileRename {
+  int32 code = 1;
+  string message =2;
+  bytes fileData = 3;
+}

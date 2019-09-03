@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-download
+  labels:
+    app: svc-download
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    name: downloadrpc
+  - port: 38080
+    protocol: TCP
+    name: downloadrest
+  selector:
+    app: svc-download
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: svc-download
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: svc-download
+  template:
+    metadata:
+      labels:
+        app: svc-download
+    spec:
+      containers:
+        - name: svc-download
+          command: [
+            "/download",
+            "--server_address=0.0.0.0:8080",
+            "--broker_address=0.0.0.0:10001",
+            "--registry=kubernetes",
+          ]
+          image: hub.fileserver.com/filestore/download
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 8080
+            name: downloadrpc
+          - containerPort: 38080
+            name: downloadrest
+          volumeMounts:
+          - mountPath: /data/fileserver
+            name: file-volume
+      volumes:
+      - name: file-volume
+        hostPath:
+          path: /data/fileserver

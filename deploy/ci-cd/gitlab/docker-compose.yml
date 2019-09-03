@@ -1,0 +1,41 @@
+version: '2'
+
+services:
+  gitlab:
+    image: 'twang2218/gitlab-ce-zh:11.1.4'
+    restart: always
+    container_name: gitlab
+    hostname: 'git.fileserver.com'
+    environment:
+      VIRTUAL_HOST: git.fileserver.com
+      VIRTUAL_NETWORK: nginx-proxy
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://git.fileserver.com'
+        gitlab_rails['time_zone'] = 'Asia/Shanghai'
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "smtpdm.aliyun.com"
+        gitlab_rails['smtp_tls'] = true
+        gitlab_rails['smtp_port'] = 465
+        gitlab_rails['smtp_user_name'] = "<发信账号>"
+        gitlab_rails['smtp_password'] = "<密码>"
+        gitlab_rails['smtp_domain'] = "smtpdm.aliyun.com"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['gitlab_email_from'] = '<发信人>'
+        gitlab_rails['backup_keep_time'] = 14515200
+        logging['logrotate_frequency'] = "weekly"
+        logging['logrotate_rotate'] = 52
+        logging['logrotate_compress'] = "compress"
+        logging['logrotate_method'] = "copytruncate"
+        logging['logrotate_delaycompress'] = "delaycompress"
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+        # Add any other gitlab.rb configuration options
+    ports:
+      - '8443:443'
+      - '2222:22'
+      - '8081:80'
+      - '9090:9090'
+    volumes:
+      - '/data/gitlab/etc:/etc/gitlab'
+      - '/data/gitlab/log:/var/log/gitlab'
+      - '/data/gitlab/data:/var/opt/gitlab'

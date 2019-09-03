@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-upload
+  labels:
+    app: svc-upload
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    name: uploadrpc
+  - port: 28080
+    protocol: TCP
+    name: uploadrest
+  selector:
+    app: svc-upload
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: svc-upload
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: svc-upload
+  template:
+    metadata:
+      labels:
+        app: svc-upload
+    spec:
+      containers:
+        - name: svc-upload
+          command: [
+            "/upload",
+            "--server_address=0.0.0.0:8080",
+            "--broker_address=0.0.0.0:10001",
+            "--registry=kubernetes",
+          ]
+          image: hub.fileserver.com/filestore/upload
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 8080
+            name: uploadrpc
+          - containerPort: 28080
+            name: uploadrest
+          volumeMounts:
+          - mountPath: /data/fileserver
+            name: file-volume
+      volumes:
+      - name: file-volume
+        hostPath:
+          path: /data/fileserver

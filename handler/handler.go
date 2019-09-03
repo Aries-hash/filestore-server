@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"filestore-server/store/ceph"
 	"encoding/json"
-	
+	"filestore-server/store/ceph"
+
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -54,25 +54,34 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		newFile.Seek(0, 0)
-        
+
 		fileMeta.FileSha1 = util.FileSha1(newFile)
-		
+
 		//同时将文件写入到ceph存储中
 		newFile.Seek(0, 0)
-        data,_:=ioutil.ReadAll(newFile)
-        bucket:=ceph.GetCephBucket("userfile")
-		cephPath:="/ceph/"+fileMeta.FileSha1
-		_=bucket.Put(cephPath,data,"octet-stream",s3.PublicRead)
-        fileMeta.Location=cephPath
+		data, _ := ioutil.ReadAll(newFile)
+		// bucket:=ceph.GetCephBucket("userfile")
+		// cephPath:="/ceph/"+fileMeta.FileSha1
+		// _=bucket.Put(cephPath,data,"octet-stream",s3.PublicRead)
+		// fileMeta.Location=cephPath
+		ossPath := "oss/" + fileMeta.FileSha1
+		err = oss.Bucket().PutObject(ossPath, newFile)
+		if err != nil {
+			fmt.Println(err.Error())
+			w.Write([]byte("Upload failed!"))
+			return
+		}
+		fileMeta.Location = ossPath
+
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
 		//TODO:更新用户文件表记录
 		r.ParseForm()
-		username:=r.Form.Get("username")
-        suc:=dblayer.OnUserFileUploadFinished(username,fileMeta.FileSha1,fileMeta.FileName,fileMeta.FileSize)
-		if suc{
-			http.Redirect(w,r,"/static/view/home.html",http.StatusFound)
-		}else{
+		username := r.Form.Get("username")
+		suc := dblayer.OnUserFileUploadFinished(username, fileMeta.FileSha1, fileMeta.FileName, fileMeta.FileSize)
+		if suc {
+			http.Redirect(w, r, "/static/view/home.html", http.StatusFound)
+		} else {
 			w.Write([]byte("Upload Failed!"))
 		}
 		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
@@ -89,8 +98,8 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filehash := r.Form["filehash"][0]
 	//fMeta := meta.GetFileMeta(filehash)
-	fMeta,err :=meta.GetFileMetaDB(filehash)
-	if err!=nil {
+	fMeta, err := meta.GetFileMetaDB(filehash)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -230,3 +239,24 @@ func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// DownloadURLHandler : 生成文件的下载地址
+func DownloadURLHandler(w http.ResponseWriter, r *http.Request) {
+	filehash := r.Form.Get("filehash")
+	// 从文件表查找记录
+	row, _ := dblayer.GetFileMeta(filehash)
+
+	// TODO: 判断文件存在OSS，还是Ceph，还是在本地
+	if strings.HasPrefix(row.FileAddr.String, "/tmp") {
+		username := r.Form.Get("username")
+		token := r.Form.Get("token")
+		tmpUrl := fmt.Sprintf("http://%s/file/download?filehash=%s&username=%s&token=%s",
+			r.Host, filehash, username, token)
+		w.Write([]byte(tmpUrl))
+	} else if strings.HasPrefix(row.FileAddr.String, "/ceph") {
+		// TODO: ceph下载url
+	} else if strings.HasPrefix(row.FileAddr.String, "oss/") {
+		// oss下载url
+		signedURL := oss.DownloadURL(row.FileAddr.String)
+		w.Write([]byte(signedURL))
+	}
+}

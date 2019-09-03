@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	// "github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
 	pool      *redis.Pool
 	redisHost = "127.0.0.1:6379"
-	redisPass = ""
+	redisPass = "testupload"
 )
-
 
 // newRedisPool : 创建redis连接池
 func newRedisPool() *redis.Pool {
@@ -30,6 +30,7 @@ func newRedisPool() *redis.Pool {
 
 			// 2. 访问认证
 			if _, err = c.Do("AUTH", redisPass); err != nil {
+				fmt.Println(err)
 				c.Close()
 				return nil, err
 			}
@@ -47,8 +48,10 @@ func newRedisPool() *redis.Pool {
 
 func init() {
 	pool = newRedisPool()
+	data, err := pool.Get().Do("KEYS", "*")
+	fmt.Println(err)
+	fmt.Println(data)
 }
-
 
 func RedisPool() *redis.Pool {
 	return pool

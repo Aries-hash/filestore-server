@@ -1,0 +1,82 @@
+version: '2'
+
+services:
+# apigw service
+  apigw:
+    image: hub.fileserver.com/filestore/apigw
+    networks:
+      - web
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+    labels:
+      - "traefik.backend=apigw"
+      - "traefik.frontend.rule=Host:apigw.fileserver.com"
+      - "traefik.docker.port=8080"
+# upload service
+  upload:
+    image: hub.fileserver.com/filestore/upload
+    networks:
+      - web
+    volumes:
+      - /data/fileserver:/data/fileserver
+      - /data/fileserver_part:/data/fileserver_part
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+    labels:
+      - "traefik.backend=upload"
+      - "traefik.frontend.rule=Host:upload.fileserver.com"
+      - "traefik.docker.port=28080"
+# download service
+  download:
+    image: hub.fileserver.com/filestore/download
+    networks:
+      - web
+    volumes:
+      - /data/fileserver:/data/fileserver
+      - /data/fileserver_part:/data/fileserver_part
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+    labels:
+      - "traefik.backend=download"
+      - "traefik.frontend.rule=Host:download.fileserver.com"
+      - "traefik.docker.port=38080"
+# account service
+  account:
+    image: hub.fileserver.com/filestore/account
+    networks:
+      - web
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+# transfer service
+  transfer:
+    image: hub.fileserver.com/filestore/transfer
+    networks:
+      - web
+    volumes:
+      - /data/fileserver:/data/fileserver
+      - /data/fileserver_part:/data/fileserver_part
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+# dbproxy service
+  dbproxy:
+    image: hub.fileserver.com/filestore/dbproxy
+    networks:
+      - web
+    env_file:
+      - ./.env
+    environment:
+      - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
+networks:
+  web:
+    external:
+      name: fileserver

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package go.micro.service.dbproxy;
+
+service DBProxyService {
+    // 请求执行sql动作
+    rpc ExecuteAction(ReqExec) returns (RespExec) {}
+}
+
+message SingleAction {
+	string name = 1;
+	bytes params = 2; // 请求参数列表, json-encoded
+}
+
+message ReqExec {
+  bool sequence = 1;  // 是否严格按照给定顺序串行执行
+  bool transaction = 2; // 所有action是否在一个事务里执行
+  int32 resultType = 3; // 0表示每个sql函数的结果都返回; 1表示只返回最后一个执行sql的结果(要求sequence执行)
+  repeated SingleAction action = 4; // 一个或多个sql函数
+}
+
+message RespExec {
+    int32 code = 1;
+    string msg = 2;
+    bytes data = 3; // 执行的结果
+}
